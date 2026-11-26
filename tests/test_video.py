@@ -110,6 +110,43 @@ class VideoTests(unittest.TestCase):
         with self.assertRaises(video.VideoError):
             video.VideoPlayer(bad)
 
+    def test_sound_track(self):
+        import array
+        import math
+
+        import av
+        path = os.path.join(self.tmp.name, "with_sound.mp4")
+        c = av.open(path, "w")
+        vs = c.add_stream("mpeg4", rate=10)
+        vs.width, vs.height, vs.pix_fmt = 160, 128, "yuv420p"
+        a = c.add_stream("aac", rate=48000)
+        a.layout = "stereo"
+        for i in range(10):
+            for p in vs.encode(av.VideoFrame.from_image(make_number_card(160, 128, str(i)))):
+                c.mux(p)
+        for k in range(40):
+            fr = av.AudioFrame(format="s16", layout="stereo", samples=1024)
+            fr.planes[0].update(array.array("h", [int(800 * math.sin(j / 9)) for j in range(2048)]).tobytes())
+            fr.sample_rate = 48000
+            for p in a.encode(fr):
+                c.mux(p)
+        for st in (vs, a):
+            for p in st.encode():
+                c.mux(p)
+        c.close()
+        silent = video.VideoPlayer(self.path, -1)
+        self.addCleanup(silent.close)
+        self.assertFalse(silent.has_audio)
+        p = video.VideoPlayer(path, -1)          # may have no audio device on CI - must not fail
+        self.addCleanup(p.close)
+        self.assertTrue(p.has_audio)
+        p.play()
+        time.sleep(0.3)
+        p.seek(0.5)
+        p.pause()
+        p.set_audio_device(None)
+        self.assertFalse(p.has_audio)
+
     def test_format_time(self):
         self.assertEqual(video.format_time(75), "1:15")
         self.assertEqual(video.format_time(3725), "1:02:05")

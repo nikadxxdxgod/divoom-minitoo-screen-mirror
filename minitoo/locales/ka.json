@@ -256,5 +256,10 @@
  "This Python has no Bluetooth socket support — use the COM port connection.": "ამ Python-ს Bluetooth სოკეტის მხარდაჭერა არ აქვს — გამოიყენეთ COM პორტი.",
  "channel": "არხი",
  "{port} could not be opened: {err}": "{port} ვერ გაიხსნა: {err}",
- "The video has no frames to show.": "ვიდეოში საჩვენებელი კადრი არ არის."
+ "The video has no frames to show.": "ვიდეოში საჩვენებელი კადრი არ არის.",
+ "Sound:": "ხმა:",
+ "Off": "გამორთული",
+ "Windows default output": "Windows-ის ნაგულისხმევი გამოსასვლელი",
+ "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "თუ ხმა თავად MiniToo-ზე უკრავს, დინამიკმა სურათის ნაცვლად შეიძლება ხმის ვიზუალიზაცია აჩვენოს — ამის თავიდან ასაცილებლად აირჩიეთ კომპიუტერის დინამიკი.",
+ "no sound in this file": "ამ ფაილში ხმა არ არის"
 }

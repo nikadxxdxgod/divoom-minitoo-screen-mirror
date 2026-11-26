@@ -290,6 +290,12 @@ class MainWindow(QMainWindow):
         self.loop_cb = QCheckBox(_("Loop"))
         self.loop_cb.toggled.connect(self._on_loop)
         lay.addWidget(self.loop_cb)
+        self.sound_combo = _combo([])
+        self.sound_combo.setToolTip(_("If the sound plays on the MiniToo itself, the speaker may "
+                                      "show its sound visualizer instead of the picture — choose "
+                                      "the PC speakers to avoid that."))
+        self.sound_combo.currentIndexChanged.connect(self._on_sound_changed)
+        lay.addLayout(hrow(QLabel(_("Sound:")), self.sound_combo))
         g = QGroupBox(_("Upload a clip as an animation"))
         gf = QFormLayout(g)
         self.clip_seconds = QSpinBox()
@@ -520,6 +526,7 @@ class MainWindow(QMainWindow):
         self.fps_slider.setValue(max(1, min(30, round(s.target_fps))))
         self.skip_cb.setChecked(s.skip_unchanged)
         self.loop_cb.setChecked(s.video_loop)
+        self._fill_sound_devices()
         self.clip_fps.setValue(s.clip_fps)
         self.clip_seconds.setValue(int(s.clip_seconds))
         self._on_fps_changed(self.fps_slider.value())
@@ -1250,7 +1257,7 @@ class MainWindow(QMainWindow):
         if self._mirroring and self._source_kind == "video":
             self.engine.stop(wait=True)
         try:
-            player = VideoPlayer(path)
+            player = VideoPlayer(path, self._sound_device())
         except VideoError as e:
             QMessageBox.warning(self, APP_NAME, _("The video could not be opened:") + f"\n{e}")
             return
@@ -1261,7 +1268,9 @@ class MainWindow(QMainWindow):
         info = player.info
         self.video_slider.setRange(0, max(1, int(info.duration * 1000)))
         self.video_label.setText(f"{os.path.basename(path)} — {info.width}×{info.height} · "
-                                 f"{info.fps:.0f} fps · {format_time(info.duration)}")
+                                 f"{info.fps:.0f} fps · {format_time(info.duration)}"
+                                 + ("" if player.audio is None or player.has_audio
+                                    else " · " + _("no sound in this file")))
         self._select_source("video")
         self._video_preview()
         self._update_controls()
@@ -1289,6 +1298,41 @@ class MainWindow(QMainWindow):
             return
         self.video.toggle()
         self._tick_video()
+
+    def _fill_sound_devices(self) -> None:
+        from ..audio import output_devices
+
+        want = self.s.video_sound
+        self.sound_combo.blockSignals(True)
+        self.sound_combo.clear()
+        self.sound_combo.addItem(_("Off"), "off")
+        self.sound_combo.addItem(_("Windows default output"), "default")
+        try:
+            for dev_id, name in output_devices():
+                self.sound_combo.addItem(name, f"dev:{dev_id}:{name}")
+        except Exception as e:
+            log.warning("sound devices: %s", e)
+        idx = 1
+        for i in range(self.sound_combo.count()):
+            data = self.sound_combo.itemData(i)
+            if data == want or (want.startswith("dev:") and data.split(":", 2)[-1] == want.split(":", 2)[-1]):
+                idx = i
+                break
+        self.sound_combo.setCurrentIndex(idx)
+        self.sound_combo.blockSignals(False)
+
+    def _sound_device(self) -> Optional[int]:
+        data = self.sound_combo.currentData() or "default"
+        if data == "off":
+            return None
+        if data.startswith("dev:"):
+            return int(data.split(":", 2)[1])
+        return -1
+
+    def _on_sound_changed(self, *_a) -> None:
+        self.s.video_sound = self.sound_combo.currentData() or "default"
+        if self.video is not None:
+            self.video.set_audio_device(self._sound_device())
 
     def _on_loop(self, on: bool) -> None:
         if self.video is not None:

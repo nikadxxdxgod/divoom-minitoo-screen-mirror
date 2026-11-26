@@ -256,5 +256,10 @@
  "This Python has no Bluetooth socket support — use the COM port connection.": "Bu Python Bluetooth soketlerini desteklemiyor — COM bağlantı noktası bağlantısını kullanın.",
  "channel": "kanal",
  "{port} could not be opened: {err}": "{port} açılamadı: {err}",
- "The video has no frames to show.": "Videoda gösterilecek kare yok."
+ "The video has no frames to show.": "Videoda gösterilecek kare yok.",
+ "Sound:": "Ses:",
+ "Off": "Kapalı",
+ "Windows default output": "Windows varsayılan çıkışı",
+ "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "Ses MiniToo'nun kendisinde çalarsa, hoparlör resim yerine ses görselleştiricisini gösterebilir — bunu önlemek için bilgisayar hoparlörlerini seçin.",
+ "no sound in this file": "bu dosyada ses yok"
 }

@@ -159,9 +159,10 @@ class VideoDecoder:
 
 
 class VideoPlayer:
-    """Real-time playback clock (play / pause / seek / loop) + decoder."""
+    """Real-time playback clock (play / pause / seek / loop) + decoder, and
+    optionally the sound (audio.AudioTrack) kept in sync with the picture."""
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, audio_device: Optional[int] = None) -> None:
         self._dec = VideoDecoder(path)
         self.info = self._dec.info
         self.loop = True
@@ -169,9 +170,34 @@ class VideoPlayer:
         self._playing = False
         self._base_pos = 0.0
         self._base_t = time.perf_counter()
+        self._last_pos = 0.0
         self.ended = False
+        self.audio = None
+        self.set_audio_device(audio_device)
+
+    @property
+    def has_audio(self) -> bool:
+        return self.audio is not None and self.audio.has_audio
+
+    def set_audio_device(self, device: Optional[int]) -> None:
+        """None = no sound, -1 = Windows default output, n = waveOut device n."""
+        old, self.audio = self.audio, None
+        if old is not None:
+            old.stop()
+        if device is None:
+            return
+        try:
+            from .audio import AudioTrack
+            self.audio = AudioTrack(self.info.path, device)
+        except Exception as e:  # pragma: no cover
+            log.warning("no sound: %s", e)
+            return
+        if self._playing:
+            self.audio.play_from(self.position)
 
     def close(self) -> None:
+        if self.audio is not None:
+            self.audio.stop()
         with self._lock:
             self._dec.close()
 
@@ -197,6 +223,9 @@ class VideoPlayer:
                 self._playing = False
                 self._base_pos = dur
                 self.ended = True
+        if self._playing and pos < self._last_pos - 0.5 and self.audio is not None:
+            self.audio.play_from(pos)                   # looped: sound starts again too
+        self._last_pos = pos
         return pos
 
     def play(self) -> None:
@@ -205,12 +234,18 @@ class VideoPlayer:
                 self._base_pos = 0.0
                 self.ended = False
             self._base_t = time.perf_counter()
+            self._last_pos = self._base_pos
             self._playing = True
+            pos = self._base_pos
+        if self.audio is not None:
+            self.audio.play_from(pos)
 
     def pause(self) -> None:
         with self._lock:
             self._base_pos = self._position_locked()
             self._playing = False
+        if self.audio is not None:
+            self.audio.stop()
 
     def toggle(self) -> None:
         if self._playing:
@@ -223,10 +258,27 @@ class VideoPlayer:
             dur = self.info.duration
             self._base_pos = min(max(0.0, t), dur) if dur else max(0.0, t)
             self._base_t = time.perf_counter()
+            self._last_pos = self._base_pos
             self.ended = False
+            playing, pos = self._playing, self._base_pos
+        if self.audio is not None and playing:
+            self.audio.play_from(pos)
+
+    def _resync(self) -> None:
+        """Keep the picture on the sound's clock (sound devices drift a little)."""
+        a = self.audio
+        if a is None or not self._playing or not a.active:
+            return
+        apos = a.position()
+        if apos is None:
+            return
+        wall = self._base_pos + time.perf_counter() - self._base_t
+        if abs(wall - apos) > 0.3 and (not self.info.duration or apos < self.info.duration):
+            self._base_pos, self._base_t = apos, time.perf_counter()
 
     def current_frame(self) -> Optional[Image.Image]:
         with self._lock:
+            self._resync()
             pos = self._position_locked()
             return self._dec.frame_at(pos)
 

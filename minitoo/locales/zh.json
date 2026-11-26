@@ -256,5 +256,10 @@
  "This Python has no Bluetooth socket support — use the COM port connection.": "此 Python 不支持蓝牙套接字 — 请使用 COM 端口连接。",
  "channel": "通道",
  "{port} could not be opened: {err}": "无法打开 {port}：{err}",
- "The video has no frames to show.": "视频中没有可显示的帧。"
+ "The video has no frames to show.": "视频中没有可显示的帧。",
+ "Sound:": "声音：",
+ "Off": "关闭",
+ "Windows default output": "Windows 默认输出",
+ "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "如果声音在 MiniToo 本身播放，音箱可能会显示音频可视化而不是图片 — 请选择电脑扬声器以避免这种情况。",
+ "no sound in this file": "此文件没有声音"
 }

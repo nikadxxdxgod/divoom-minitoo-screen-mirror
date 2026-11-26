@@ -256,5 +256,10 @@
  "This Python has no Bluetooth socket support — use the COM port connection.": "이 Python은 블루투스 소켓을 지원하지 않습니다 — COM 포트 연결을 사용하세요.",
  "channel": "채널",
  "{port} could not be opened: {err}": "{port}을(를) 열 수 없습니다: {err}",
- "The video has no frames to show.": "동영상에 표시할 프레임이 없습니다."
+ "The video has no frames to show.": "동영상에 표시할 프레임이 없습니다.",
+ "Sound:": "소리:",
+ "Off": "끔",
+ "Windows default output": "Windows 기본 출력",
+ "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "소리가 MiniToo 자체에서 재생되면 스피커가 이미지 대신 사운드 시각화를 표시할 수 있습니다 — 이를 피하려면 PC 스피커를 선택하세요.",
+ "no sound in this file": "이 파일에는 소리가 없습니다"
 }

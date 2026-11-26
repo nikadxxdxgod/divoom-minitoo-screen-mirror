@@ -32,13 +32,16 @@ Get the latest version from **[Releases](../../releases/latest)**:
 | `MiniTooMirror-Setup-x.y.z.exe` | **Installer** (recommended). Start menu entry, optional desktop icon, uninstaller, and a choice of program language during setup. No admin rights needed. |
 | `MiniTooMirror-x.y.z-portable.zip` | **Portable**: unzip anywhere and run `MiniTooMirror.exe`. |
 
-Windows SmartScreen may warn about an unknown publisher, because the program is not code-signed. Click *More info → Run anyway*.
+**"Windows protected your PC"?** That is SmartScreen. It warns about every new program without a paid code-signing certificate. Click **More info → Run anyway**.
+
+- The full source code is in this repository.
+- The release files are built automatically by GitHub Actions from that code (see the *Actions* tab).
 
 ## Features
 
 - **Sources:** each display, a single window (even when it is covered), a screen region you drag on a screenshot, an image or GIF, and video files.
 - **Video:** two ways to show it.
-  - Play it live, at about 3–5 updates per second.
+  - Play it live, at about 3–5 updates per second, with **sound** on the PC speakers or any output you choose.
   - Upload a short clip as an animation that the MiniToo plays by itself, smoothly and in a loop.
 - **Picture:**
   - Fit, fill (crop) or stretch.

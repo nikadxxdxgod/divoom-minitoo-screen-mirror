@@ -256,5 +256,10 @@
  "This Python has no Bluetooth socket support — use the COM port connection.": "Dieses Python unterstützt keine Bluetooth-Sockets — verwenden Sie die COM-Port-Verbindung.",
  "channel": "Kanal",
  "{port} could not be opened: {err}": "{port} konnte nicht geöffnet werden: {err}",
- "The video has no frames to show.": "Das Video enthält keine anzeigbaren Bilder."
+ "The video has no frames to show.": "Das Video enthält keine anzeigbaren Bilder.",
+ "Sound:": "Ton:",
+ "Off": "Aus",
+ "Windows default output": "Windows-Standardausgabe",
+ "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "Wenn der Ton auf dem MiniToo selbst läuft, zeigt der Lautsprecher evtl. seinen Klang-Visualizer statt des Bildes — wählen Sie die PC-Lautsprecher, um das zu vermeiden.",
+ "no sound in this file": "kein Ton in dieser Datei"
 }

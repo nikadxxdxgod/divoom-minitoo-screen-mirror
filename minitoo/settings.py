@@ -74,6 +74,7 @@ class AppSettings:
 
     # video
     video_loop: bool = True
+    video_sound: str = "default"        # off | default | dev:<id>:<name>
     clip_fps: int = 12
     clip_seconds: float = 5.0
 

@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec.bak
+diagnostic_report.txt
+minitoo_diagnostics.txt
+.vscode/
+.idea/
+*.log

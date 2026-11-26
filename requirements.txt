@@ -1,0 +1,6 @@
+PyQt6>=6.5
+Pillow>=10.1
+pyserial>=3.5
+av>=12            # video files (FFmpeg)
+# Python 3.14+ has zstd built in (compression.zstd); older versions need this package
+zstandard>=0.22; python_version < "3.14"

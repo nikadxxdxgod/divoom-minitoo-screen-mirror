@@ -84,8 +84,9 @@ class AudioTrack:
         self.device_id = device_id
         self.has_audio = self._probe()
         self._thread: Optional[threading.Thread] = None
-        self._stop = threading.Event()
-        self._lock = threading.Lock()
+        self._workers: List[Tuple[threading.Thread, threading.Event]] = []
+        self._ctl = threading.Lock()          # play_from / stop never run at the same time
+        self._lock = threading.Lock()         # guards the waveOut handle
         self._hwo = None
         self._start_pos = 0.0
         self._paused = False
@@ -101,15 +102,29 @@ class AudioTrack:
     # ---------------------------------------------------------------- control
 
     def play_from(self, t: float) -> None:
+        """(Re)start the sound at `t`. Every older playback is stopped first -
+        two sounds never play over each other, whichever thread calls this."""
         if not self.has_audio or sys.platform != "win32":
             return
-        self.stop()
-        self._stop = threading.Event()
-        self._start_pos = max(0.0, t)
-        self._paused = False
-        self._thread = threading.Thread(target=self._run, args=(self._start_pos, self._stop),
-                                        name="minitoo-audio", daemon=True)
-        self._thread.start()
+        with self._ctl:
+            self._stop_all()
+            ev = threading.Event()
+            self._start_pos = max(0.0, t)
+            self._paused = False
+            th = threading.Thread(target=self._run, args=(self._start_pos, ev),
+                                  name="minitoo-audio", daemon=True)
+            self._workers.append((th, ev))
+            self._thread = th
+            th.start()
+
+    def _stop_all(self) -> None:
+        for _th, ev in self._workers:
+            ev.set()
+        for th, _ev in self._workers:
+            if th is not threading.current_thread():
+                th.join(3.0)
+        self._workers = [(th, ev) for th, ev in self._workers if th.is_alive()]
+        self._thread = None
 
     def pause(self) -> None:
         with self._lock:
@@ -124,15 +139,18 @@ class AudioTrack:
                 self._paused = False
 
     def stop(self) -> None:
-        self._stop.set()
-        th = self._thread
-        if th is not None and th is not threading.current_thread():
-            th.join(2.0)
-        self._thread = None
+        with self._ctl:
+            self._stop_all()
 
     @property
     def active(self) -> bool:
-        return self._thread is not None and self._thread.is_alive()
+        th = self._thread
+        return th is not None and th.is_alive()
+
+    @property
+    def playing_count(self) -> int:
+        """Number of playback threads still alive (tests: must be 0 or 1)."""
+        return sum(1 for th, _ev in self._workers if th.is_alive())
 
     def position(self) -> Optional[float]:
         """Seconds of the file that have been heard, or None."""
@@ -183,6 +201,9 @@ class AudioTrack:
         hdrs = [WAVEHDR() for _ in range(BUFFERS)]
         prepared = [False] * BUFFERS
         with self._lock:
+            if stop.is_set():
+                winmm.waveOutClose(hwo)
+                return
             self._hwo = hwo
         pending = bytearray()
         source = self._pcm(start, stop)
@@ -224,7 +245,8 @@ class AudioTrack:
             log.warning("audio stopped: %s", e)
         finally:
             with self._lock:
-                self._hwo = None
+                if self._hwo is hwo:
+                    self._hwo = None
             winmm.waveOutReset(hwo)
             for k, h in enumerate(hdrs):
                 if prepared[k]:

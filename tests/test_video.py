@@ -126,7 +126,7 @@ class VideoTests(unittest.TestCase):
                 c.mux(p)
         for k in range(40):
             fr = av.AudioFrame(format="s16", layout="stereo", samples=1024)
-            fr.planes[0].update(array.array("h", [int(800 * math.sin(j / 9)) for j in range(2048)]).tobytes())
+            fr.planes[0].update(array.array("h", [0 * int(math.sin(j / 9)) for j in range(2048)]).tobytes())
             fr.sample_rate = 48000
             for p in a.encode(fr):
                 c.mux(p)
@@ -142,8 +142,21 @@ class VideoTests(unittest.TestCase):
         self.assertTrue(p.has_audio)
         p.play()
         time.sleep(0.3)
+        import threading
+        ts = [threading.Thread(target=lambda: [p.audio.play_from(0.2) for _ in range(4)])
+              for _ in range(4)]
+        for t in ts:
+            t.start()
+        for t in ts:
+            t.join()
+        self.assertLessEqual(p.audio.playing_count, 1)      # never two sounds at once
+        for i in range(10):
+            p.seek(i * 0.05, restart_audio=False)
         p.seek(0.5)
+        self.assertLessEqual(p.audio.playing_count, 1)
         p.pause()
+        time.sleep(0.1)
+        self.assertEqual(p.audio.playing_count, 0)
         p.set_audio_device(None)
         self.assertFalse(p.has_audio)
 

@@ -253,7 +253,9 @@ class VideoPlayer:
         else:
             self.play()
 
-    def seek(self, t: float) -> None:
+    def seek(self, t: float, restart_audio: bool = True) -> None:
+        """restart_audio=False while the user drags the slider - the sound is
+        restarted once, when the slider is released."""
         with self._lock:
             dur = self.info.duration
             self._base_pos = min(max(0.0, t), dur) if dur else max(0.0, t)
@@ -261,7 +263,7 @@ class VideoPlayer:
             self._last_pos = self._base_pos
             self.ended = False
             playing, pos = self._playing, self._base_pos
-        if self.audio is not None and playing:
+        if self.audio is not None and playing and restart_audio:
             self.audio.play_from(pos)
 
     def _resync(self) -> None:

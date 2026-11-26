@@ -1340,7 +1340,7 @@ class MainWindow(QMainWindow):
 
     def _slider_moved(self, value: int) -> None:
         if self.video is not None:
-            self.video.seek(value / 1000)
+            self.video.seek(value / 1000, restart_audio=False)
             self._video_preview()
 
     def _slider_released(self) -> None:

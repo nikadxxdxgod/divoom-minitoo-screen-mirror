@@ -18,6 +18,7 @@ from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDockWidget, QF
                              QVBoxLayout, QWidget)
 
 from .. import APP_NAME, REPO_URL, __version__
+from .. import displays
 from ..bt_windows import (BtDevice, find_devices, list_bluetooth_com_ports, normalize_mac,
                           open_bluetooth_settings, usb_divoom_devices)
 from ..capture import CaptureSource, Rect, WindowInfo, find_window, list_monitors, list_windows
@@ -48,7 +49,9 @@ METHOD_LABELS = [(N_("From screen — what is visible"), "screen"),
                  (N_("From window — even if covered"), "printwindow")]
 RESTART_TITLE = N_("Restart required")
 RESTART_TEXT = N_("The new language is used after a restart. Restart now?")
-SOURCE_ICONS = {"monitor": "🖥", "window": "🗔", "region": "⬚", "image": "🖼", "video": "🎬"}
+SOURCE_ICONS = {"monitor": "🖥", "window": "🗔", "region": "⬚", "image": "🖼", "video": "🎬",
+                "stats": "📊"}
+EXTRA_SCREEN_HELP = REPO_URL + "#minitoo-as-an-extra-screen"
 CLIP_BUDGET = 350_000
 
 
@@ -85,6 +88,8 @@ class MainWindow(QMainWindow):
         self.device: Optional[MiniTooDevice] = None
         self.engine: Optional[MirrorEngine] = None
         self.video = None               # video.VideoPlayer
+        self.stats_monitor = None       # stats.StatsMonitor (while the stats source is used)
+        self._display_devs = {}         # device name -> displays.DisplayDevice
         self._devices: List[BtDevice] = []
         self._windows: List[WindowInfo] = []
         self._region: Optional[Rect] = Rect.from_list(settings.region)
@@ -122,6 +127,9 @@ class MainWindow(QMainWindow):
         self._video_timer = QTimer(self)
         self._video_timer.timeout.connect(self._tick_video)
         self._video_timer.start(200)
+        self._stats_timer = QTimer(self)
+        self._stats_timer.timeout.connect(self._tick_stats)
+        self._stats_timer.start(1000)
         log.info("%s %s · %s", APP_NAME, __version__, AppSettings.path())
         if self.s.auto_connect and (self.s.address or self.s.connection == "simulator"):
             QTimer.singleShot(300, self._connect)
@@ -212,6 +220,16 @@ class MainWindow(QMainWindow):
         lay.setContentsMargins(0, 0, 0, 0)
         self.monitor_info = muted("")
         lay.addWidget(self.monitor_info)
+        g = QGroupBox(_("MiniToo as an extra screen"))
+        gl = QVBoxLayout(g)
+        self.extra_info = muted("")
+        gl.addWidget(self.extra_info)
+        self.extra_btn = QPushButton("")
+        self.extra_btn.clicked.connect(self._setup_extra_screen)
+        help_btn = QPushButton(_("How to set it up"))
+        help_btn.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(EXTRA_SCREEN_HELP)))
+        gl.addLayout(hrow(self.extra_btn, help_btn, None))
+        lay.addWidget(g)
         lay.addStretch(1)
         self.page_monitor = self.props.addWidget(w)
         # window
@@ -318,6 +336,19 @@ class MainWindow(QMainWindow):
         lay.addWidget(g)
         lay.addStretch(1)
         self.page_video = self.props.addWidget(w)
+        # system stats
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(muted(_("Shows CPU, graphics card, RAM and network load, the temperature "
+                              "and the time on the MiniToo. Updated every second.")))
+        self.stats_sensors = muted("")
+        lay.addWidget(self.stats_sensors)
+        lay.addWidget(muted(_("For exact CPU and graphics card temperatures, run "
+                              "LibreHardwareMonitor with “Remote Web Server” turned on "
+                              "(port 8085).")))
+        lay.addStretch(1)
+        self.page_stats = self.props.addWidget(w)
 
         v = QVBoxLayout()
         v.addWidget(self.props)
@@ -583,6 +614,8 @@ class MainWindow(QMainWindow):
             self.device.disconnect()
         if self.video is not None:
             self.video.close()
+        if self.stats_monitor is not None:
+            self.stats_monitor.stop()
         self._store_settings()
         self._save_settings()
         logging.getLogger("minitoo").removeHandler(self._log_handler)
@@ -831,14 +864,24 @@ class MainWindow(QMainWindow):
             log.warning("displays: %s", e)
             monitors = []
         self._monitors = monitors
+        try:
+            self._display_devs = displays.display_devices()
+        except Exception as e:
+            log.warning("display devices: %s", e)
+            self._display_devs = {}
         for m in monitors:
-            self._add_source(f"{SOURCE_ICONS['monitor']}  {_('Display {n}', n=m.index)}",
+            dev = self._display_devs.get(m.name)
+            tag = f" · {_('virtual')}" if dev is not None and dev.virtual else ""
+            self._add_source(f"{SOURCE_ICONS['monitor']}  {_('Display {n}', n=m.index)}{tag}",
                              f"monitor:{m.index}")
-            self.source_list.item(self.source_list.count() - 1).setToolTip(m.label())
+            tip = m.label() + (f"\n{dev.adapter} · {dev.monitor}" if dev is not None else "")
+            self.source_list.item(self.source_list.count() - 1).setToolTip(tip)
         self._add_source(f"{SOURCE_ICONS['window']}  {_('Window')}", "window:0")
         self._add_source(f"{SOURCE_ICONS['region']}  {_('Screen region')}", "region:0")
         self._add_source(f"{SOURCE_ICONS['image']}  {_('Image / GIF')}", "image:0")
         self._add_source(f"{SOURCE_ICONS['video']}  {_('Video file')}", "video:0")
+        self._add_source(f"{SOURCE_ICONS['stats']}  {_('System stats')}", "stats:0")
+        self._update_extra_screen()
         self.source_list.setMinimumWidth(self.source_list.sizeHintForColumn(0) + 34)
         target = f"{self._source_kind}:{self._monitor_index if self._source_kind == 'monitor' else 0}"
         for i in range(self.source_list.count()):
@@ -861,9 +904,10 @@ class MainWindow(QMainWindow):
         kind, idx_s = str(item.data(Qt.ItemDataRole.UserRole)).split(":")
         idx = int(idx_s)
         if self.engine is not None and self.engine.running and kind != self._source_kind:
-            if kind in ("image",) or self._source_kind == "video" or kind == "video":
+            if kind in ("image", "video", "stats") or self._source_kind in ("video", "stats"):
                 self.engine.stop(wait=False)
         self._source_kind = kind
+        self._sync_stats_monitor()
         if kind == "monitor":
             self._monitor_index = idx
             m = next((m for m in self._monitors if m.index == idx), None)
@@ -883,6 +927,9 @@ class MainWindow(QMainWindow):
         elif kind == "video":
             self.props.setCurrentIndex(self.page_video)
             self._video_preview()
+        elif kind == "stats":
+            self.props.setCurrentIndex(self.page_stats)
+            self._tick_stats()
         self.dock_props.setWindowTitle(_("Source settings") + " · " + item.text().split("  ", 1)[-1])
         self._update_controls()
         self._on_option_changed()
@@ -966,12 +1013,19 @@ class MainWindow(QMainWindow):
 
     def _mirror_config(self) -> MirrorConfig:
         s = self.s
-        return MirrorConfig(source=self._capture_source(), image=self._image_options(),
-                            fmt_key=s.fmt_key, jpeg_quality=self.quality_slider.value(),
-                            chroma_444=self.chroma_cb.isChecked(), max_frame_kb=s.max_frame_kb,
-                            target_fps=float(self.fps_slider.value()),
-                            skip_unchanged=self.skip_cb.isChecked(), keepalive_s=s.keepalive_s,
-                            batch_frames=s.batch_frames, batch_interval_ms=s.batch_interval_ms)
+        cfg = MirrorConfig(source=self._capture_source(), image=self._image_options(),
+                           fmt_key=s.fmt_key, jpeg_quality=self.quality_slider.value(),
+                           chroma_444=self.chroma_cb.isChecked(), max_frame_kb=s.max_frame_kb,
+                           target_fps=float(self.fps_slider.value()),
+                           skip_unchanged=self.skip_cb.isChecked(), keepalive_s=s.keepalive_s,
+                           batch_frames=s.batch_frames, batch_interval_ms=s.batch_interval_ms)
+        if self._source_kind == "stats":
+            # the dashboard changes once per second: no need to look more often,
+            # and an unchanged picture is never sent again
+            cfg.target_fps = min(cfg.target_fps, 2.0)
+            cfg.skip_unchanged = True
+            cfg.batch_frames = 1
+        return cfg
 
     def _on_option_changed(self, *_a) -> None:
         if self._loading:
@@ -1039,7 +1093,7 @@ class MainWindow(QMainWindow):
             self.start_btn.setText(_("Play on device") if kind == "video" else _("Start mirroring"))
             self.start_btn.setProperty("active", False)
             self.start_btn.setProperty("primary", True)
-            ok_source = kind in ("monitor", "window", "region") or (kind == "video" and self.video)
+            ok_source = kind in ("monitor", "window", "region", "stats") or (kind == "video" and self.video)
             self.start_btn.setEnabled(connected and not self._uploading and bool(ok_source))
         self.start_btn.style().unpolish(self.start_btn)
         self.start_btn.style().polish(self.start_btn)
@@ -1076,6 +1130,10 @@ class MainWindow(QMainWindow):
             player = self.video
             grabber_factory = lambda: VideoGrabber(player)  # noqa: E731
             player.play()
+        if kind == "stats":
+            from ..stats import StatsGrabber
+            monitor = self._sync_stats_monitor()
+            grabber_factory = lambda: StatsGrabber(monitor)  # noqa: E731
         self._store_settings()
         self._save_settings()
         self.engine = MirrorEngine(
@@ -1103,6 +1161,7 @@ class MainWindow(QMainWindow):
             log.info(_("Stopped"))
         if self.video is not None:
             self.video.pause()
+        self._sync_stats_monitor()
         self._update_controls()
 
     def _on_preview(self, img, ef, res) -> None:
@@ -1238,6 +1297,95 @@ class MainWindow(QMainWindow):
             self._update_controls()
 
         run_in_background(self.invoker, work, done, fail, name="send-still")
+
+    # ============================================================ system stats
+
+    def _sync_stats_monitor(self):
+        """The sensors are read only while the stats source is selected or
+        still being mirrored."""
+        if self._source_kind == "stats":
+            if self.stats_monitor is None:
+                from ..stats import StatsMonitor
+                self.stats_monitor = StatsMonitor()
+            self.stats_monitor.start()
+        elif self.stats_monitor is not None and not self._mirroring:
+            self.stats_monitor.stop()
+        return self.stats_monitor
+
+    def _tick_stats(self) -> None:
+        mon = self.stats_monitor
+        if mon is None or self._source_kind != "stats":
+            return
+        r = mon.latest()
+        if r is not None:
+            text = _("Sensors in use: {names}", names=", ".join(r.sources) or "—")
+            gpus = []
+            for d in self._display_devs.values():
+                if d.attached and d.adapter and not d.virtual and d.adapter not in gpus:
+                    gpus.append(d.adapter)
+            if gpus:
+                text += "\nGPU: " + ", ".join(gpus)
+            self.stats_sensors.setText(text)
+        img = mon.image()
+        if img is None or self._mirroring:
+            return
+        fmt = FORMATS.get(self.s.fmt_key, FORMATS["jpeg160"])
+        try:
+            self.preview.set_image(process_frame(img, (fmt.width, fmt.height), self._image_options()),
+                                   _("Preview (not sent yet)"))
+        except Exception as e:
+            log.warning("stats preview: %s", e)
+
+    # ============================================================ extra screen
+
+    def _virtual_monitors(self):
+        return [m for m in self._monitors
+                if (d := self._display_devs.get(m.name)) is not None and d.virtual]
+
+    def _update_extra_screen(self) -> None:
+        virt = self._virtual_monitors()
+        if virt:
+            n = virt[0].index
+            self.extra_info.setText(_("Windows treats Display {n} as a normal monitor: move "
+                                      "windows onto it and they appear on the MiniToo.", n=n))
+            self.extra_btn.setText(_("Use Display {n} as the MiniToo screen", n=n))
+        else:
+            self.extra_info.setText(_("For this, Windows needs a virtual display: install a "
+                                      "virtual display driver and the new display appears here "
+                                      "in Sources. Then move windows onto it like onto a normal "
+                                      "monitor."))
+        self.extra_btn.setVisible(bool(virt))
+
+    def _setup_extra_screen(self) -> None:
+        virt = self._virtual_monitors()
+        if not virt:
+            return
+        m = virt[0]
+        cur = displays.current_mode(m.name)
+        shape_ok = cur is not None and displays.is_minitoo_shape(cur[0], cur[1])
+        if not shape_ok:
+            best = displays.best_minitoo_mode(displays.list_modes(m.name))
+            if best is None:
+                log.info(_("Display {n} has no 5:4 size, so the picture has black bars at the "
+                           "edges.", n=m.index))
+            elif QMessageBox.question(
+                    self, APP_NAME,
+                    _("Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the "
+                      "MiniToo screen, so the picture fills it without black bars.",
+                      n=m.index, w=best[0], h=best[1])) == QMessageBox.StandardButton.Yes:
+                code = displays.set_mode(m.name, best[0], best[1])
+                if code in (displays.DISP_CHANGE_SUCCESSFUL, displays.DISP_CHANGE_RESTART):
+                    log.info("%s: %d×%d", _("Display {n}", n=m.index), best[0], best[1])
+                else:
+                    QMessageBox.warning(self, APP_NAME,
+                                        _("Could not change the resolution (code {code}).", code=code))
+        # the whole desktop of that display, nothing cut off, with the mouse pointer
+        _select_data(self.fit_combo, "fit")
+        self.cursor_cb.setChecked(True)
+        self._monitor_index = m.index
+        self._source_kind = "monitor"
+        # the display's size may have changed - read the displays again
+        QTimer.singleShot(800, self._refresh_sources)
 
     # ============================================================ video
 

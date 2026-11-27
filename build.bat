@@ -7,7 +7,12 @@ if not exist ".venv\Scripts\python.exe" (
     call install.bat
     if not exist ".venv\Scripts\python.exe" exit /b 1
 )
-for /f "delims=" %%v in ('".venv\Scripts\python.exe" -c "import minitoo; print(minitoo.__version__)"') do set "VERSION=%%v"
+for /f "delims=" %%v in ('call "%~dp0.venv\Scripts\python.exe" "%~dp0tools\version.py"') do set "VERSION=%%v"
+if not defined VERSION (
+    echo Could not read the version from minitoo\__init__.py.
+    pause
+    exit /b 1
+)
 echo.
 echo === MiniToo Mirror %VERSION% ===
 

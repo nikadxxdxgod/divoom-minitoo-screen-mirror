@@ -261,5 +261,19 @@
  "Off": "Kapalı",
  "Windows default output": "Windows varsayılan çıkışı",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "Ses MiniToo'nun kendisinde çalarsa, hoparlör resim yerine ses görselleştiricisini gösterebilir — bunu önlemek için bilgisayar hoparlörlerini seçin.",
- "no sound in this file": "bu dosyada ses yok"
+ "no sound in this file": "bu dosyada ses yok",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "Ekran {n} {w}×{h} olarak değiştirilsin mi? Bu 5:4 boyut MiniToo ekranıyla aynı şekle sahiptir, bu yüzden görüntü ekranı siyah şeritler olmadan doldurur.",
+ "Could not change the resolution (code {code}).": "Çözünürlük değiştirilemedi (kod {code}).",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "Ekran {n} için 5:4 boyut yok, bu yüzden görüntünün kenarlarında siyah şeritler olacak.",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "İşlemci ve ekran kartının tam sıcaklıkları için LibreHardwareMonitor'ı “Remote Web Server” açık olarak çalıştırın (port 8085).",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "Bunun için Windows'un sanal bir ekrana ihtiyacı var: bir sanal ekran sürücüsü kurun, yeni ekran burada Kaynaklar'da görünür. Sonra pencereleri normal bir monitöre taşır gibi ona taşıyın.",
+ "How to set it up": "Nasıl kurulur",
+ "MiniToo as an extra screen": "Ek ekran olarak MiniToo",
+ "Sensors in use: {names}": "Kullanılan sensörler: {names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "MiniToo'da işlemci, ekran kartı, RAM ve ağ yükünü, sıcaklığı ve saati gösterir. Her saniye güncellenir.",
+ "System stats": "Sistem bilgileri",
+ "Use Display {n} as the MiniToo screen": "Ekran {n}'i MiniToo ekranı olarak kullan",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "Windows, Ekran {n}'i normal bir monitör gibi görür: pencereleri ona taşıyın, MiniToo'da görünürler.",
+ "virtual": "sanal",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "MiniToo yanıt vermeyi bıraktı, bu yüzden gönderim durduruldu. Ekranı donduysa yeniden başlatmak için güç düğmesini 10 saniye basılı tutun."
 }

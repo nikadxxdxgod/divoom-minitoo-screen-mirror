@@ -261,5 +261,19 @@
  "Off": "Desligado",
  "Windows default output": "Saída padrão do Windows",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "Se o som tocar no próprio MiniToo, a caixa pode mostrar o visualizador de áudio em vez da imagem — escolha os alto-falantes do PC para evitar isso.",
- "no sound in this file": "sem som neste arquivo"
+ "no sound in this file": "sem som neste arquivo",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "Mudar a Tela {n} para {w}×{h}? Esse tamanho 5:4 tem o mesmo formato da tela do MiniToo, então a imagem a preenche sem barras pretas.",
+ "Could not change the resolution (code {code}).": "Não foi possível mudar a resolução (código {code}).",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "A Tela {n} não tem tamanho 5:4, então a imagem terá barras pretas nas bordas.",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "Para temperaturas exatas da CPU e da placa de vídeo, execute o LibreHardwareMonitor com “Remote Web Server” ativado (porta 8085).",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "Para isso, o Windows precisa de uma tela virtual: instale um driver de tela virtual e a nova tela aparece aqui em Fontes. Depois mova janelas para ela como para um monitor normal.",
+ "How to set it up": "Como configurar",
+ "MiniToo as an extra screen": "MiniToo como tela extra",
+ "Sensors in use: {names}": "Sensores em uso: {names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "Mostra no MiniToo o uso da CPU, da placa de vídeo, da RAM e da rede, a temperatura e a hora. Atualizado a cada segundo.",
+ "System stats": "Dados do sistema",
+ "Use Display {n} as the MiniToo screen": "Usar a Tela {n} como tela do MiniToo",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "O Windows trata a Tela {n} como um monitor normal: mova janelas para ela e elas aparecem no MiniToo.",
+ "virtual": "virtual",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "O MiniToo parou de responder, então o envio foi interrompido. Se a tela estiver travada, segure o botão liga/desliga por 10 segundos para reiniciá-lo."
 }

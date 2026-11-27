@@ -40,6 +40,8 @@ Get the latest version from **[Releases](../../releases/latest)**:
 ## Features
 
 - **Sources:** each display, a single window (even when it is covered), a screen region you drag on a screenshot, an image or GIF, and video files.
+- **System stats:** CPU, graphics card, RAM and network load, the temperature and the time as a small dashboard, updated every second.
+- **Extra screen:** with a virtual display driver, the MiniToo becomes one more monitor that you can move windows onto (see [below](#minitoo-as-an-extra-screen)).
 - **Video:** two ways to show it.
   - Play it live, at about 3–5 updates per second, with **sound** on the PC speakers or any output you choose.
   - Upload a short clip as an animation that the MiniToo plays by itself, smoothly and in a loop.
@@ -70,6 +72,30 @@ Get the latest version from **[Releases](../../releases/latest)**:
 4. Pick a **source** (bottom left) → **Start mirroring**. For an image, use **Send to device** instead.
 
 A small region (one panel, a clock, a chat) looks far sharper on the 160×128 screen than a whole 1080p display.
+
+## System stats
+
+Choose **System stats** in Sources → **Start mirroring**. The MiniToo shows the time and four tiles with a graph of the last minute:
+
+- **CPU:** load and temperature;
+- **GPU:** load of the busiest graphics engine (like Task Manager), and its temperature when known;
+- **RAM:** use in % and GB;
+- **NET:** download and upload speed.
+
+Everything is read without administrator rights from Windows performance counters. The temperature comes from the ACPI thermal zone, which on most laptops follows the CPU. For exact CPU and graphics card temperatures, run [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) with *Options → Remote Web Server* turned on (port 8085); MiniToo Mirror picks it up by itself. NVIDIA cards also report their temperature through `nvidia-smi`. A sensor that is not available shows "—".
+
+## MiniToo as an extra screen
+
+Windows can only extend the desktop onto a display it knows. To make the MiniToo one more monitor, install a **virtual display driver** (an *Indirect Display* driver). MiniToo Mirror does not install drivers itself.
+
+1. Install a virtual display driver, for example [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) (open source, signed). Check its requirements for your Windows version first: newer drivers need a newer Windows 10/11.
+2. A new display appears in Windows and in MiniToo Mirror's Sources, marked *virtual*.
+3. Select it → **Use Display N as the MiniToo screen**. If the display offers a 5:4 size (for example 800×640 or 1280×1024: the shape of the 160×128 screen), the program offers to switch to it, so the picture fills the screen without black bars. You can change it back in Windows Settings → Display at any time.
+4. **Start mirroring**, then move windows onto that display like onto a normal monitor.
+
+Text is tiny on a 1.8" screen, so this works best for big things: a clock, a gauge, a chat, an image.
+
+To remove the driver: Device Manager → Display adapters → the virtual adapter → Uninstall device.
 
 ## Performance
 
@@ -104,6 +130,7 @@ The cable is still useful for power during long sessions. If the PC's sound play
 | Error 10060 / 10061 (timed out / refused) | Close the Divoom phone app or turn off the phone's Bluetooth; power-cycle the speaker; move it closer. |
 | Connected, but no picture | Send the **Test pattern** (source *Image / GIF*). Make sure no music is playing on the speaker. |
 | Damaged pictures | Settings → Transfer: raise *Pause between chunks* to 20 ms and turn off automatic speed. |
+| The MiniToo freezes on one picture and ignores its buttons | Hold its power button for 10 seconds to restart it. The program stops sending by itself when the speaker stops answering. |
 | A window appears black | Source settings → Capture: *From screen*. |
 | Too slow | Mode: *Balanced* or *Fastest*, or mirror a smaller region. |
 

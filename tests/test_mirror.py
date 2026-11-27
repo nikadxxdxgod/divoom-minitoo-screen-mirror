@@ -126,6 +126,23 @@ class MirrorTests(unittest.TestCase):
         self.assertTrue(wait_until(lambda: not eng.running))
         self.assertTrue(self.stopped and "closed" in self.stopped[0])
 
+    def test_stops_when_the_device_freezes(self):
+        self.fake.ignore_starts = 10 ** 6      # a frozen MiniToo: the link is up, no answers
+        eng = self.engine(target_fps=30, skip_unchanged=False, stop_after_failures=2)
+        eng.start()
+        self.assertTrue(wait_until(lambda: not eng.running, timeout=15))
+        self.assertTrue(self.stopped and "stopped answering" in self.stopped[0])
+        self.assertEqual(self.fake.uploads, 0)
+
+    def test_frozen_after_reconnect_also_stops(self):
+        # a new connection to an already frozen device: nothing is ever answered
+        self.fake.send_go_ahead = False
+        self.fake.send_ack = False
+        eng = self.engine(target_fps=30, skip_unchanged=False, stop_after_failures=4)
+        eng.start()
+        self.assertTrue(wait_until(lambda: not eng.running, timeout=20))
+        self.assertTrue(self.stopped and "stopped answering" in self.stopped[0])
+
     def test_waits_for_reconnect(self):
         self.fake.disconnect_after_uploads = 3
         self.dev.auto_reconnect = True

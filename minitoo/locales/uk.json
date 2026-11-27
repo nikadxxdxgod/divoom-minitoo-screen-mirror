@@ -261,5 +261,19 @@
  "Off": "Вимкнено",
  "Windows default output": "Типовий вихід Windows",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "Якщо звук грає на самому MiniToo, колонка може показувати візуалізацію звуку замість зображення — щоб цього уникнути, оберіть динаміки комп’ютера.",
- "no sound in this file": "у цьому файлі немає звуку"
+ "no sound in this file": "у цьому файлі немає звуку",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "Перемкнути Екран {n} на {w}×{h}? Цей розмір 5:4 має ту саму форму, що й екран MiniToo, тож зображення заповнить його без чорних смуг.",
+ "Could not change the resolution (code {code}).": "Не вдалося змінити роздільну здатність (код {code}).",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "Екран {n} не має розміру 5:4, тому зображення матиме чорні смуги по краях.",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "Для точної температури процесора й відеокарти запустіть LibreHardwareMonitor з увімкненим «Remote Web Server» (порт 8085).",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "Для цього Windows потрібен віртуальний екран: встановіть драйвер віртуального екрана, і новий екран з’явиться тут, у Джерелах. Потім переміщуйте на нього вікна, як на звичайний монітор.",
+ "How to set it up": "Як це налаштувати",
+ "MiniToo as an extra screen": "MiniToo як додатковий екран",
+ "Sensors in use: {names}": "Датчики: {names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "Показує на MiniToo навантаження процесора, відеокарти, RAM і мережі, температуру й час. Оновлюється щосекунди.",
+ "System stats": "Дані системи",
+ "Use Display {n} as the MiniToo screen": "Використати Екран {n} як екран MiniToo",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "Windows вважає Екран {n} звичайним монітором: перемістіть на нього вікна, і вони з’являться на MiniToo.",
+ "virtual": "віртуальний",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "MiniToo перестав відповідати, тому надсилання зупинено. Якщо його екран завис, утримуйте кнопку живлення 10 секунд, щоб перезапустити його."
 }

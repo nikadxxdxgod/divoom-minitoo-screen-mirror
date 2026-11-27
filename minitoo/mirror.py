@@ -49,6 +49,7 @@ class MirrorConfig:
     keepalive_s: float = 0.0             # re-send an unchanged screen every N s (0 = no)
     batch_frames: int = 1                # >1 = as an animation (experimental)
     batch_interval_ms: int = 150
+    stop_after_failures: int = 5         # stop when this many uploads in a row fail (0 = never)
 
 
 @dataclass
@@ -293,8 +294,17 @@ class MirrorEngine:
         last_seq = 0
         last_publish = 0.0
         t_prev_upload = 0.0
+        failures = 0                       # uploads in a row that the device did not take
 
         while not self._stop.is_set():
+            if failures and 0 < self._snapshot()[0].stop_after_failures <= failures:
+                # A frozen MiniToo keeps the Bluetooth link but answers nothing;
+                # sending on and on does not help it, so stop and say why.
+                self._fatal = _("The MiniToo stopped answering, so sending was stopped. If its "
+                                "screen is frozen, hold its power button for 10 seconds to "
+                                "restart it.")
+                log.warning("%d uploads in a row failed - stopping", failures)
+                break
             cfg, ver = self._snapshot()
             if ver != version or encoder is None:
                 version = ver
@@ -355,6 +365,7 @@ class MirrorEngine:
                 continue
             except UploadError as e:
                 self.stats.errors += 1
+                failures += 1
                 self._status(str(e))
                 self._stop.wait(1.0)
                 continue
@@ -368,7 +379,12 @@ class MirrorEngine:
             st.interval_ms = res.interval_ms
             st.resends += res.resends
             st.acked = res.acked
+            # The real MiniToo always answers ("send all", a chunk request or the
+            # final ack). An upload it said nothing about counts as a failure,
+            # even when the device code has stopped waiting for answers.
+            heard = res.acked or res.go_ahead or res.resends > 0 or res.restreams > 0
             if res.ok:
+                failures = 0 if heard else failures + 1
                 st.uploads += 1
                 st.latency_ms = (done - t0) * 1000
                 last_sent = frames[-1]
@@ -376,6 +392,7 @@ class MirrorEngine:
                 self._rate.add(done, len(ef.payload), len(frames))
                 st.status = _("Running")
             else:
+                failures += 1
                 st.errors += 1
                 st.status = _("Upload failed: {err}", err=res.error)
                 log.warning("upload: %s", res.summary())

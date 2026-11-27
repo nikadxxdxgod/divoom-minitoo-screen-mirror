@@ -261,5 +261,19 @@
  "Off": "끔",
  "Windows default output": "Windows 기본 출력",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "소리가 MiniToo 자체에서 재생되면 스피커가 이미지 대신 사운드 시각화를 표시할 수 있습니다 — 이를 피하려면 PC 스피커를 선택하세요.",
- "no sound in this file": "이 파일에는 소리가 없습니다"
+ "no sound in this file": "이 파일에는 소리가 없습니다",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "디스플레이 {n}을(를) {w}×{h}(으)로 바꿀까요? 이 5:4 크기는 MiniToo 화면과 모양이 같아서 검은 띠 없이 화면을 채웁니다.",
+ "Could not change the resolution (code {code}).": "해상도를 바꾸지 못했습니다(코드 {code}).",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "디스플레이 {n}에는 5:4 크기가 없어서 화면 가장자리에 검은 띠가 생깁니다.",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "정확한 CPU 및 그래픽 카드 온도를 보려면 “Remote Web Server”를 켠 상태로 LibreHardwareMonitor를 실행하세요(포트 8085).",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "이를 위해 Windows에 가상 디스플레이가 필요합니다. 가상 디스플레이 드라이버를 설치하면 새 디스플레이가 여기 소스에 나타납니다. 그다음 일반 모니터처럼 창을 옮기면 됩니다.",
+ "How to set it up": "설정 방법",
+ "MiniToo as an extra screen": "MiniToo를 추가 화면으로 사용",
+ "Sensors in use: {names}": "사용 중인 센서: {names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "MiniToo에 CPU, 그래픽 카드, RAM, 네트워크 부하와 온도, 시간을 표시합니다. 매초 업데이트됩니다.",
+ "System stats": "시스템 정보",
+ "Use Display {n} as the MiniToo screen": "디스플레이 {n}을(를) MiniToo 화면으로 사용",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "Windows는 디스플레이 {n}을(를) 일반 모니터로 취급합니다. 창을 옮기면 MiniToo에 나타납니다.",
+ "virtual": "가상",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "MiniToo가 응답하지 않아 전송을 멈췄습니다. 화면이 멈췄다면 전원 버튼을 10초 동안 눌러 다시 시작하세요."
 }

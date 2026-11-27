@@ -261,5 +261,19 @@
  "Off": "オフ",
  "Windows default output": "Windows の既定の出力",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "音声を MiniToo 本体で再生すると、画像の代わりに音声ビジュアライザーが表示されることがあります。避けるには PC のスピーカーを選択してください。",
- "no sound in this file": "このファイルには音声がありません"
+ "no sound in this file": "このファイルには音声がありません",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "ディスプレイ {n} を {w}×{h} に変更しますか？この 5:4 のサイズは MiniToo の画面と同じ形なので、黒い帯なしで画面いっぱいに表示されます。",
+ "Could not change the resolution (code {code}).": "解像度を変更できませんでした（コード {code}）。",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "ディスプレイ {n} には 5:4 のサイズがないため、画像の端に黒い帯が入ります。",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "CPU とグラフィックカードの正確な温度を表示するには、「Remote Web Server」を有効にして LibreHardwareMonitor を実行してください（ポート 8085）。",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "これには Windows に仮想ディスプレイが必要です。仮想ディスプレイドライバーをインストールすると、新しいディスプレイがここの「ソース」に表示されます。あとは普通のモニターと同じようにウィンドウを移動できます。",
+ "How to set it up": "設定方法",
+ "MiniToo as an extra screen": "MiniToo を追加の画面として使う",
+ "Sensors in use: {names}": "使用中のセンサー：{names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "CPU、グラフィックカード、RAM、ネットワークの負荷と温度、時刻を MiniToo に表示します。毎秒更新されます。",
+ "System stats": "システム情報",
+ "Use Display {n} as the MiniToo screen": "ディスプレイ {n} を MiniToo の画面にする",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "Windows はディスプレイ {n} を普通のモニターとして扱います。ウィンドウを移動すると MiniToo に表示されます。",
+ "virtual": "仮想",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "MiniToo が応答しなくなったため、送信を停止しました。画面が固まっている場合は、電源ボタンを 10 秒間長押しして再起動してください。"
 }

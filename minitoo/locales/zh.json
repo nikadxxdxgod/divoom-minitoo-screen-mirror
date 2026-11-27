@@ -261,5 +261,19 @@
  "Off": "关闭",
  "Windows default output": "Windows 默认输出",
  "If the sound plays on the MiniToo itself, the speaker may show its sound visualizer instead of the picture — choose the PC speakers to avoid that.": "如果声音在 MiniToo 本身播放，音箱可能会显示音频可视化而不是图片 — 请选择电脑扬声器以避免这种情况。",
- "no sound in this file": "此文件没有声音"
+ "no sound in this file": "此文件没有声音",
+ "Change Display {n} to {w}×{h}? This 5:4 size has the same shape as the MiniToo screen, so the picture fills it without black bars.": "将显示器 {n} 切换为 {w}×{h}？这个 5:4 尺寸与 MiniToo 屏幕形状相同，画面可以铺满屏幕，没有黑边。",
+ "Could not change the resolution (code {code}).": "无法更改分辨率（代码 {code}）。",
+ "Display {n} has no 5:4 size, so the picture has black bars at the edges.": "显示器 {n} 没有 5:4 尺寸，因此画面边缘会有黑边。",
+ "For exact CPU and graphics card temperatures, run LibreHardwareMonitor with “Remote Web Server” turned on (port 8085).": "如需准确的 CPU 和显卡温度，请运行 LibreHardwareMonitor 并开启“Remote Web Server”（端口 8085）。",
+ "For this, Windows needs a virtual display: install a virtual display driver and the new display appears here in Sources. Then move windows onto it like onto a normal monitor.": "为此，Windows 需要一个虚拟显示器：安装虚拟显示器驱动后，新显示器会出现在这里的“来源”中。然后像使用普通显示器一样把窗口移到它上面。",
+ "How to set it up": "如何设置",
+ "MiniToo as an extra screen": "将 MiniToo 用作扩展屏幕",
+ "Sensors in use: {names}": "正在使用的传感器：{names}",
+ "Shows CPU, graphics card, RAM and network load, the temperature and the time on the MiniToo. Updated every second.": "在 MiniToo 上显示 CPU、显卡、内存和网络负载，以及温度和时间。每秒更新一次。",
+ "System stats": "系统状态",
+ "Use Display {n} as the MiniToo screen": "将显示器 {n} 用作 MiniToo 屏幕",
+ "Windows treats Display {n} as a normal monitor: move windows onto it and they appear on the MiniToo.": "Windows 把显示器 {n} 当作普通显示器：把窗口移到上面，它们就会显示在 MiniToo 上。",
+ "virtual": "虚拟",
+ "The MiniToo stopped answering, so sending was stopped. If its screen is frozen, hold its power button for 10 seconds to restart it.": "MiniToo 已停止响应，因此已停止发送。如果它的屏幕卡住了，请按住电源键 10 秒钟重新启动。"
 }
